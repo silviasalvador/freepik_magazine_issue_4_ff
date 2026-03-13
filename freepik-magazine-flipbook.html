@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freepik Magazine — Issue 04</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#4d4d4d;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+
+#header{width:100%;background:#333;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222;position:sticky;top:0;z-index:100;}
+#header h1{color:#eee;font-size:13px;font-weight:500;letter-spacing:.05em;}
+#page-indicator{color:#e8e8e8;font-size:12px;}
+
+#loading{position:fixed;inset:0;background:#4d4d4d;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#loading.hidden{display:none;}
+.lcard{background:#555;border:1px solid #3a3a3a;border-radius:10px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:260px;}
+.ltrack{width:100%;height:3px;background:#333;border-radius:99px;overflow:hidden;}
+.lfill{height:100%;width:0%;background:#2383e2;border-radius:99px;transition:width .25s;}
+.lsub{font-size:12px;color:#c8c8c8;align-self:flex-start;}
+
+#viewer{display:flex;align-items:center;justify-content:center;width:100%;padding:24px 8px 32px;perspective:2400px;}
+.arr{background:rgba(0,0,0,.25);border:none;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;margin:0 12px;user-select:none;}
+.arr:hover{background:rgba(0,0,0,.45);}
+.arr:disabled{opacity:.14;cursor:default;}
+
+#book{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+#spread{display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.7),0 6px 18px rgba(0,0,0,.4);}
+#spread canvas{display:block;}
+.spine{width:4px;flex-shrink:0;background:linear-gradient(to right,rgba(0,0,0,.04),rgba(160,150,140,.4),rgba(0,0,0,.04));align-self:stretch;}
+
+#fw{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible;z-index:10;perspective:1400px;perspective-origin:center center;}
+.fp{position:absolute;border-radius:2px;}
+.fp{backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+/* Primera mitad: página sale hacia la izquierda (pivot derecho → gira positivo) */
+/* flyF1: pivot LEFT → rotateY(-90) sale hacia el espectador */
+@keyframes flyF1{
+  0%  {transform:rotateY(0deg);  filter:brightness(1);  box-shadow:8px 0 20px rgba(0,0,0,.3);}
+  100%{transform:rotateY(-90deg);filter:brightness(.3); box-shadow:28px 0 40px rgba(0,0,0,.6);}
+}
+/* flyB1: pivot RIGHT → rotateY(90) sale hacia el espectador */
+@keyframes flyB1{
+  0%  {transform:rotateY(0deg); filter:brightness(1);  box-shadow:-8px 0 20px rgba(0,0,0,.3);}
+  100%{transform:rotateY(90deg);filter:brightness(.3); box-shadow:-28px 0 40px rgba(0,0,0,.6);}
+}
+/* flyF2: pivot RIGHT, llega desde el espectador */
+@keyframes flyF2{
+  0%  {transform:rotateY(90deg); filter:brightness(.3); box-shadow:28px 0 40px rgba(0,0,0,.6);}
+  100%{transform:rotateY(0deg);  filter:brightness(.85);box-shadow:4px 0 8px rgba(0,0,0,.2);}
+}
+/* flyB2: pivot LEFT, llega desde el espectador */
+@keyframes flyB2{
+  0%  {transform:rotateY(-90deg);filter:brightness(.3); box-shadow:-28px 0 40px rgba(0,0,0,.6);}
+  100%{transform:rotateY(0deg);  filter:brightness(.85);box-shadow:-4px 0 8px rgba(0,0,0,.2);}
+}
+
+#controls{display:none;flex-direction:column;align-items:center;gap:6px;padding:8px 0 16px;width:100%;}
+#controls.show{display:flex;}
+#navrow{display:flex;align-items:center;gap:7px;}
+.nb{height:28px;padding:0 10px;background:#555;border:1px solid #3a3a3a;border-radius:5px;cursor:pointer;font:500 11px 'Segoe UI',sans-serif;color:#e0e0e0;display:flex;align-items:center;gap:4px;}
+.nb:hover{background:#666;color:#eee;}
+.nb:disabled{opacity:.2;cursor:default;pointer-events:none;}
+.nb svg{width:11px;height:11px;fill:currentColor;}
+.nb.sq{width:28px;padding:0;justify-content:center;}
+.pill{height:28px;background:#3a3a3a;border:1px solid #3a3a3a;border-radius:5px;padding:0 10px;display:flex;align-items:center;gap:6px;font-size:11px;color:#e0e0e0;}
+.ji{width:38px;height:20px;border:1px solid #3a3a3a;border-radius:4px;background:#4a4a4a;text-align:center;outline:none;font:11px 'Segoe UI',sans-serif;color:#eee;}
+.jg{height:20px;padding:0 6px;background:#4a4a4a;border:1px solid #3a3a3a;border-radius:4px;font:11px 'Segoe UI',sans-serif;cursor:pointer;color:#e0e0e0;}
+.jg:hover{background:#555;color:#eee;}
+.vs{width:1px;height:12px;background:#3a3a3a;}
+
+#thumbbar{display:flex;gap:5px;overflow-x:auto;max-width:min(94vw,1000px);padding:12px 6px 2px;scrollbar-width:thin;scrollbar-color:#555 transparent;}
+#thumbbar::-webkit-scrollbar{height:3px;}
+#thumbbar::-webkit-scrollbar-thumb{background:#555;border-radius:2px;}
+.th{flex-shrink:0;width:40px;height:56px;border-radius:2px;overflow:hidden;cursor:pointer;opacity:.35;outline:2px solid transparent;outline-offset:1px;transition:opacity .2s,outline .2s;background:#3a3a3a;}
+.th.active{opacity:1;outline:2px solid #ccc;}
+.th canvas{width:100%;height:100%;display:block;}
+
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>Freepik Magazine — Issue 04</h1>
+  <span id="page-indicator"></span>
+</div>
+
+<div id="loading">
+  <div class="lcard">
+    <div style="font-size:28px">📄</div>
+    <div style="font-size:14px;font-weight:600;color:#eee">Cargando revista…</div>
+    <div class="ltrack"><div class="lfill" id="lbar"></div></div>
+    <div class="lsub" id="ltxt">Descargando PDF…</div>
+  </div>
+</div>
+
+<div id="viewer">
+  <button class="arr" id="bprev">&#8249;</button>
+  <div id="book">
+    <div id="spread"></div>
+    <div id="fw"></div>
+  </div>
+  <button class="arr" id="bnext">&#8250;</button>
+</div>
+
+<div id="controls">
+  <div id="navrow">
+    <button class="nb sq" id="bfirst"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+    <div class="pill">
+      <input class="ji" type="number" id="ji" min="1" placeholder="pág">
+      <div class="vs"></div>
+      <button class="jg" id="bjump">Ir</button>
+    </div>
+    <button class="nb sq" id="blast"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM14 6h2v12h-2z"/></svg></button>
+  </div>
+  <div id="thumbbar"></div>
+  
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const PDF = './freepik_magazine_issue_4.pdf';
+const CMAP = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/';
+
+let pdf=null, PC={}, TC={}, total=0, cur=0, busy=false;
+
+function ns(){
+  if(total<=0)return 0;
+  if(total===1)return 1;
+  return 1+Math.ceil((total-2)/2)+1;
+}
+function sidxs(s){
+  const n=ns();
+  if(s===0)return[0];
+  if(s===n-1)return[total-1];
+  const l=1+(s-1)*2,r=l+1;
+  if(r>=total-1)return[l];
+  return[l,r];
+}
+function sof(i){
+  if(i===0)return 0;
+  if(i===total-1)return ns()-1;
+  return 1+Math.floor((i-1)/2);
+}
+
+async function rp(n){
+  if(PC[n])return;
+  const pg=await pdf.getPage(n);
+  const vp=pg.getViewport({scale:1.6});
+  const c=document.createElement('canvas');
+  c.width=vp.width;c.height=vp.height;
+  await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+  PC[n]=c;
+  const tv=pg.getViewport({scale:.09});
+  const tc=document.createElement('canvas');
+  tc.width=tv.width;tc.height=tv.height;
+  await pg.render({canvasContext:tc.getContext('2d'),viewport:tv}).promise;
+  TC[n]=tc;
+}
+async function es(s){for(const i of sidxs(s))await rp(i+1);}
+async function bg(){for(let i=1;i<=total;i++){await rp(i);if(i%8===0)bt();}bt();}
+
+function pgel(idx,mh){
+  const n=idx+1,src=PC[n];
+  if(!src){const d=document.createElement('div');d.style.cssText=`height:${mh}px;width:${Math.round(mh*.707)}px;background:#3a3a3a;`;return d;}
+  const h=Math.min(mh,src.height),w=Math.round(h*src.width/src.height);
+  const c=document.createElement('canvas');
+  c.width=src.width;c.height=src.height;c.getContext('2d').drawImage(src,0,0);
+  c.style.cssText=`display:block;height:${h}px;width:${w}px;`;
+  return c;
+}
+
+function draw(s){
+  const mh=Math.round(window.innerHeight*.70);
+  const el=document.getElementById('spread');
+  el.innerHTML='';
+  const idxs=sidxs(s);
+  const w=document.createElement('div');
+  w.style.cssText='display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.7),0 6px 18px rgba(0,0,0,.4);';
+  if(idxs.length===1){
+    w.appendChild(pgel(idxs[0],mh));
+  } else {
+    const L=pgel(idxs[0],mh);L.style.borderRight='1px solid #111';
+    const sp=document.createElement('div');sp.className='spine';
+    w.appendChild(L);w.appendChild(sp);w.appendChild(pgel(idxs[1],mh));
+  }
+  el.appendChild(w);
+  ui(s);
+}
+
+function flip(dir){
+  if(busy)return;
+  const nxt=cur+dir;
+  if(nxt<0||nxt>=ns())return;
+  busy=true;
+  const fi=dir>0?sidxs(cur)[sidxs(cur).length-1]:sidxs(nxt)[0];
+  const src=PC[fi+1];
+  if(!src){busy=false;return;}
+  const bk=document.getElementById('book');
+  const bw=bk.offsetWidth,bh=bk.offsetHeight;
+  const currentIsSingle=sidxs(cur).length===1;
+  const nextIsSingle=sidxs(nxt).length===1;
+  const ph=bh;
+  const pw=currentIsSingle?bw:Math.round(bw/2);
+  const originX=dir>0?(currentIsSingle?0:bw/2):(currentIsSingle?bw-pw:bw/2-pw);
+  const half=0.35;
+  const fw=document.getElementById('fw');
+  fw.innerHTML='';
+  const fc1=document.createElement('canvas');
+  fc1.width=src.width;fc1.height=src.height;
+  fc1.getContext('2d').drawImage(src,0,0);
+  fc1.style.cssText=`display:block;width:${pw}px;height:${ph}px;`;
+  const fp1=document.createElement('div');
+  fp1.className='fp';
+  fp1.style.cssText=`width:${pw}px;height:${ph}px;position:absolute;top:0;left:${originX}px;transform-origin:${dir>0?'left':'right'} center;animation:${dir>0?'flyF1':'flyB1'} ${half}s ease-in forwards;`;
+  fp1.appendChild(fc1);
+  fw.appendChild(fp1);
+  fp1.addEventListener('animationend',()=>{
+    fp1.remove();
+    cur=nxt;
+    draw(cur);
+    const bw2=bk.offsetWidth;
+    const fi2=dir>0?sidxs(nxt)[0]:sidxs(nxt)[sidxs(nxt).length-1];
+    const src2=PC[fi2+1]||src;
+    const pw2=nextIsSingle?bw2:Math.round(bw2/2);
+    const originX2=dir>0?(nextIsSingle?0:0):(nextIsSingle?0:bw2/2);
+    const fc2=document.createElement('canvas');
+    fc2.width=src2.width;fc2.height=src2.height;
+    fc2.getContext('2d').drawImage(src2,0,0);
+    fc2.style.cssText=`display:block;width:${pw2}px;height:${ph}px;`;
+    const fp2=document.createElement('div');
+    fp2.className='fp';
+    fp2.style.cssText=`width:${pw2}px;height:${ph}px;position:absolute;top:0;left:${originX2}px;transform-origin:${dir>0?'right':'left'} center;animation:${dir>0?'flyF2':'flyB2'} ${half}s ease-out forwards;`;
+    fp2.appendChild(fc2);
+    fw.appendChild(fp2);
+    fp2.addEventListener('animationend',()=>{fw.innerHTML='';busy=false;},{once:true});
+  },{once:true});
+}
+
+async function fwd(){if(busy||cur>=ns()-1)return;await es(cur+1);flip(1);}
+async function bck(){if(busy||cur<=0)return;await es(cur-1);flip(-1);}
+async function go(s){
+  if(s===cur||s<0||s>=ns())return;
+  await es(s);
+  if(Math.abs(s-cur)===1)flip(s>cur?1:-1);
+  else{cur=s;draw(s);}
+}
+
+function ui(s){
+  const n=ns(),idxs=sidxs(s),nums=idxs.map(i=>i+1);
+  document.getElementById('page-indicator').textContent=
+    s===0?'Portada':s===n-1?'Contraportada':`Pág. ${nums.join('–')} / ${total}`;
+  document.getElementById('bprev').disabled=s<=0;
+  document.getElementById('bnext').disabled=s>=n-1;
+  document.getElementById('bfirst').disabled=s<=0;
+  document.getElementById('blast').disabled=s>=n-1;
+  document.getElementById('ji').value=nums[0];
+  st(s);
+}
+function bt(){
+  const bar=document.getElementById('thumbbar'),n=ns();
+  const ex=bar.querySelectorAll('.th').length;
+  for(let s=ex;s<n;s++){
+    const d=document.createElement('div');d.className='th';d.dataset.s=s;
+    bar.appendChild(d);
+    d.addEventListener('click',async()=>await go(parseInt(d.dataset.s)));
+  }
+  bar.querySelectorAll('.th').forEach(d=>{
+    if(d.querySelector('canvas'))return;
+    const s=parseInt(d.dataset.s),n=sidxs(s)[0]+1;
+    if(TC[n]){
+      const tc=document.createElement('canvas');
+      tc.width=TC[n].width;tc.height=TC[n].height;
+      tc.getContext('2d').drawImage(TC[n],0,0);
+      tc.style.cssText='width:100%;height:100%;display:block;';
+      d.appendChild(tc);
+    }
+  });
+  st(cur);
+}
+function st(s){
+  document.querySelectorAll('.th').forEach(d=>d.classList.toggle('active',parseInt(d.dataset.s)===s));
+  const a=document.querySelector(`.th[data-s="${s}"]`);
+  if(a)a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+
+// LOAD
+(async()=>{
+  try{
+    const task=pdfjsLib.getDocument({url:PDF,cMapUrl:CMAP,cMapPacked:true});
+    task.onProgress=p=>{
+      if(p.total>0){
+        const pct=Math.round(p.loaded/p.total*100);
+        document.getElementById('lbar').style.width=pct+'%';
+        document.getElementById('ltxt').textContent=`Descargando… ${pct}%`;
+      }
+    };
+    pdf=await task.promise;
+    total=pdf.numPages;
+    document.getElementById('ji').max=total;
+    document.getElementById('ltxt').textContent='Renderizando…';
+    for(let i=1;i<=Math.min(4,total);i++)await rp(i);
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('controls').classList.add('show');
+    bt();cur=0;draw(0);
+    bg();
+  }catch(e){
+    document.getElementById('ltxt').textContent='❌ '+e.message;
+    console.error(e);
+  }
+})();
+
+document.getElementById('bnext').addEventListener('click',fwd);
+document.getElementById('bprev').addEventListener('click',bck);
+document.getElementById('bfirst').addEventListener('click',()=>go(0));
+document.getElementById('blast').addEventListener('click',()=>go(ns()-1));
+document.getElementById('bjump').addEventListener('click',()=>{const v=parseInt(document.getElementById('ji').value);if(!isNaN(v)&&v>=1&&v<=total)go(sof(v-1));});
+document.getElementById('ji').addEventListener('keydown',e=>{if(e.key==='Enter'){const v=parseInt(e.target.value);if(!isNaN(v))go(sof(v-1));}});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')fwd();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')bck();
+  if(e.key==='Home')go(0);if(e.key==='End')go(ns()-1);
+});
+let tx=0;
+document.getElementById('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.getElementById('book').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?fwd():bck();}});
+</script>
+</body>
+</html>
