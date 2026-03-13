@@ -22,7 +22,7 @@ body{background:transparent;font-family:'Segoe UI',sans-serif;display:flex;flex-
 .arr:disabled{opacity:.14;cursor:default;}
 
 #book{position:relative;display:inline-flex;align-items:center;justify-content:center;}
-#spread{display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.15);}
+#spread{display:flex;align-items:stretch;border-radius:2px;box-shadow:0 8px 20px rgba(80,60,50,.12),0 3px 8px rgba(80,60,50,.08);}
 #spread canvas{display:block;}
 .spine{width:4px;flex-shrink:0;background:linear-gradient(to right,rgba(0,0,0,.04),rgba(160,150,140,.4),rgba(0,0,0,.04));align-self:stretch;}
 
@@ -144,7 +144,7 @@ function draw(s){
   el.innerHTML='';
   const idxs=sidxs(s);
   const w=document.createElement('div');
-  w.style.cssText='display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.15);';
+  w.style.cssText='display:flex;align-items:stretch;border-radius:2px;box-shadow:0 8px 20px rgba(80,60,50,.12),0 3px 8px rgba(80,60,50,.08);';
   if(idxs.length===1){
     w.appendChild(pgel(idxs[0],mh));
   } else {
