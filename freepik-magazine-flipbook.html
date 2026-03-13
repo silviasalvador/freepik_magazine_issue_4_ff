@@ -216,8 +216,8 @@ async function go(s){
 
 function ui(s){
   const n=ns(),idxs=sidxs(s),nums=idxs.map(i=>i+1);
-  document.getElementById('page-indicator').textContent=
-    s===0?'Portada':s===n-1?'Contraportada':`Pág. ${nums.join('–')} / ${total}`;
+  const pi=document.getElementById('page-indicator');
+  if(pi) pi.textContent=s===0?'Portada':s===n-1?'Contraportada':`Pág. ${nums.join('–')} / ${total}`;
   document.getElementById('bprev').disabled=s<=0;
   document.getElementById('bnext').disabled=s>=n-1;
   document.getElementById('ji').value=nums[0];
