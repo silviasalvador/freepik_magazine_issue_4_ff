@@ -6,7 +6,7 @@
 <title>Freepik Magazine — Issue 04</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:transparent;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+body{background:transparent;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:unset;}
 
 #header{width:100%;background:#333;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222;position:sticky;top:0;z-index:100;}
 #header h1{color:#eee;font-size:13px;font-weight:500;letter-spacing:.05em;}
@@ -19,7 +19,7 @@ body{background:transparent;font-family:'Segoe UI',sans-serif;display:flex;flex-
 .lfill{height:100%;width:0%;background:#2383e2;border-radius:99px;transition:width .25s;}
 .lsub{font-size:12px;color:#c8c8c8;align-self:flex-start;}
 
-#viewer{display:flex;align-items:center;justify-content:center;width:100%;padding:24px 8px 32px;perspective:2400px;}
+#viewer{display:flex;align-items:center;justify-content:center;width:100%;padding:16px 8px 16px;perspective:2400px;}
 .arr{background:rgba(0,0,0,.25);border:none;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;margin:0 12px;user-select:none;}
 .arr:hover{background:rgba(0,0,0,.45);}
 .arr:disabled{opacity:.14;cursor:default;}
@@ -49,7 +49,7 @@ body{background:transparent;font-family:'Segoe UI',sans-serif;display:flex;flex-
   100%{transform:rotateY(0deg);  filter:brightness(.85);box-shadow:-4px 0 8px rgba(0,0,0,.2);}
 }
 
-#controls{display:none;flex-direction:column;align-items:center;gap:6px;padding:8px 0 16px;width:100%;}
+#controls{display:none;flex-direction:column;align-items:center;gap:6px;padding:4px 0 8px;width:100%;}
 #controls.show{display:flex;}
 #navrow{display:flex;align-items:center;gap:7px;}
 .pill{height:28px;background:#3a3a3a;border:1px solid #3a3a3a;border-radius:5px;padding:0 10px;display:flex;align-items:center;gap:6px;font-size:11px;color:#e0e0e0;}
