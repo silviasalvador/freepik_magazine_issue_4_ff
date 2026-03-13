@@ -6,7 +6,7 @@
 <title>Freepik Magazine — Issue 04</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#4d4d4d;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+body{background:transparent;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
 
 #header{width:100%;background:#333;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222;position:sticky;top:0;z-index:100;}
 #header h1{color:#eee;font-size:13px;font-weight:500;letter-spacing:.05em;}
@@ -25,7 +25,7 @@ body{background:#4d4d4d;font-family:'Segoe UI',sans-serif;display:flex;flex-dire
 .arr:disabled{opacity:.14;cursor:default;}
 
 #book{position:relative;display:inline-flex;align-items:center;justify-content:center;}
-#spread{display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.7),0 6px 18px rgba(0,0,0,.4);}
+#spread{display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.15);}
 #spread canvas{display:block;}
 .spine{width:4px;flex-shrink:0;background:linear-gradient(to right,rgba(0,0,0,.04),rgba(160,150,140,.4),rgba(0,0,0,.04));align-self:stretch;}
 
@@ -151,7 +151,7 @@ function draw(s){
   el.innerHTML='';
   const idxs=sidxs(s);
   const w=document.createElement('div');
-  w.style.cssText='display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.7),0 6px 18px rgba(0,0,0,.4);';
+  w.style.cssText='display:flex;align-items:stretch;border-radius:2px;box-shadow:0 22px 64px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.15);';
   if(idxs.length===1){
     w.appendChild(pgel(idxs[0],mh));
   } else {
